@@ -1,22 +1,22 @@
+from qdrant_client import QdrantClient
 
-import qdrant_client
+client = QdrantClient(url="http://localhost:3336", timeout=10000)
 
-client = QdrantClient(url="http://localhost:6333", timeout=900)
+# Путь ВНУТРИ контейнера (соответствует вашему -v маунту)
+# Файл лежит в root примонтированной папки /qdrant/storage/
+snapshot_location = "file:///qdrant/snapshots/patents_collection_bge-8618925416111929-2026-05-18-18-41-28.snapshot"
 
-
-snapshot_name = "patents_collection_snapshot.snapshot"
-print(f"🔄 Восстанавливаю из {snapshot_name}...")
+print(f"🔄 Восстанавливаю из {snapshot_location}...")
 
 try:
-    # Восстанавливаем коллекцию из снапшота
     client.recover_snapshot(
-        collection_name="patents_collection_2",
-        location="file:///qdrant/snapshots/patents_collection_snapshot.snapshot"
+        collection_name="patents_collection_bge",
+        location=snapshot_location
     )
     print("Успешно восстановлено!")
 
     # Проверка: получаем информацию о коллекции
-    info = client.get_collection("patents_collection_2")
+    info = client.get_collection("patents_collection_bge")
     print(f"Коллекция содержит {info.vectors_count} векторов")
 
 except Exception as e:
